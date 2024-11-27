@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1 class="mb-4">Todo List</h1>
+  <a href="{% url 'task_create' %}" class="btn btn-primary mb-4">Add Task</a>
+
+  {% for task in tasks %}
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="d-flex align-items-center mb-2">
+              <h5>
+                {{ task.content }}
+              </h5>
+              <span class="ms-2 badge {% if task.is_done %}bg-success{% else %}bg-warning{% endif %}">
+                                {% if task.is_done %}Done{% else %}Not Done{% endif %}
+                            </span>
+            </div>
+            <p class="text-muted mb-1">Created: {{ task.created_at }}</p>
+            {% if task.deadline %}
+              <p class="text-muted mb-2">Deadline: {{ task.deadline }}</p>
+            {% endif %}
+            {% if task.tags.all %}
+              <div class="mb-2">
+                <span>Tags: </span>
+                {% for tag in task.tags.all %}
+
+                  <span class="badge bg-secondary me-1">{{ tag.name }}</span>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+          <div class="btn-group">
+            {% if task.is_done %}
+              <a href="{% url 'task_complete' task.id %}" class="btn btn-success">Undo</a>
+            {% else %}
+              <a href="{% url 'task_complete' task.id %}" class="btn btn-success">Complete</a>
+            {% endif %}
+            <a href="{% url 'task_update' task.id %}" class="btn btn-warning">Update</a>
+            <form action="{% url 'task_delete' task.id %}" method="post" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p>No tasks found.</p>
+  {% endfor %}
+{% endblock %}
